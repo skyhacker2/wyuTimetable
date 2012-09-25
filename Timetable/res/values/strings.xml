@@ -1,0 +1,40 @@
+<resources>
+
+    <string name="app_name">益达课表</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">设置</string>
+    <string name="title_activity_display">益达课表</string>
+    <color name="item1_bg1">#aa33B5E5</color>
+    <color name="item1_bg2">#aa0099CC</color>
+    <color name="item2_bg1">#aaAA66CC</color>
+    <color name="item2_bg2">#aa9933CC</color>
+    <color name="item3_bg1">#aa99CC00</color>
+    <color name="item3_bg2">#aa669900</color>
+    <color name="item4_bg1">#aaFFBB33</color>
+    <color name="item4_bg2">#aaFF8800</color>
+    <color name="item5_bg1">#aaFF4444</color>
+    <color name="item5_bg2">#aaCC0000</color>
+    <color name="classNameColor">#e6e6e6</color>
+    <color name="defaultTextColor">#000000</color>
+    <color name="bg_alpha">#77ffffff</color>
+    <string name="userId">user_id</string>
+    <string name="userPw">user_pw</string>
+    <string name="hasData">has_data</string>
+    <string name="menu_refresh">刷新课表</string>
+    <string-array name="week">
+        <item >星期日</item>
+        <item >星期一</item>
+        <item >星期二</item>
+        <item >星期三</item>
+        <item >星期四</item>
+        <item >星期五</item>
+        <item >星期六</item>
+        <item />
+    </string-array>
+    <color name="titlebar_bg">#232323</color>
+    <string name="pre_accounts_settings">用户账号设置</string>
+    <string name="about">about</string>
+    <string name="pre_about_content">这是一款自由开源的邑大课程表软件\n作者: @SkyNoHacker\nweibo: @SkyNoHacker</string>
+    <string name="pre_other">其他</string>
+
+</resources>
