@@ -45,10 +45,10 @@ public class DisplayActivity extends Activity {
 	private int _curWeek;
 	private String[] _dates;
 	private int _nowDate;
-	
+
 	private TextView _weekTextView;
 	private TextView _nowWeekTextView;
-	
+
 	private boolean flag = false;
 
 	private ViewPager _viewPager;
@@ -65,7 +65,7 @@ public class DisplayActivity extends Activity {
 	private SQLiteDatabase _database;
 	public static final String DATABASE_NAME = "Timetable.db";
 	public static final String TABLE_NAME = "timetable";
-	
+
 	public static final int SETTINGS_CODE = 1;
 
 	@Override
@@ -74,7 +74,7 @@ public class DisplayActivity extends Activity {
 		// setContentView(R.layout.activity_display);
 		setContentView(R.layout.main);
 		Calendar cal = Calendar.getInstance();
-		_curWeek = cal.get(Calendar.DAY_OF_WEEK)-1;	// SUNDAY=1, MONDAY=2,...
+		_curWeek = cal.get(Calendar.DAY_OF_WEEK) - 1; // SUNDAY=1, MONDAY=2,...
 		_weeks = getResources().getStringArray(R.array.week);
 		_dates = getResources().getStringArray(R.array.now_weeks);
 		_weeks[_curWeek] += "(今天)";
@@ -82,7 +82,7 @@ public class DisplayActivity extends Activity {
 		initPreferences();
 		initLayout();
 	}
-	
+
 	public void initLayout() {
 		_inflater = getLayoutInflater();
 		_viewPagers = new ArrayList<View>();
@@ -90,17 +90,17 @@ public class DisplayActivity extends Activity {
 		for (int i = 0; i < 7; i++)
 			_viewPagers.add(getView(i));
 
-		//_main = (ViewGroup) _inflater.inflate(R.layout.main, null);
+		// _main = (ViewGroup) _inflater.inflate(R.layout.main, null);
 		_viewPager = (ViewPager) findViewById(R.id.viewPager);
 		_weekTextView = (TextView) findViewById(R.id.week);
 		_weekTextView.setText(_weeks[_curWeek]);
 		_nowWeekTextView = (TextView) findViewById(R.id.now_week);
 		_nowWeekTextView.setText(_dates[_nowDate]);
-		//setContentView(_main);
+		// setContentView(_main);
 		_viewPager.setAdapter(new MyPagerAdapter());
 		_viewPager.setOnPageChangeListener(new MyPagerChangeListener());
 		_viewPager.setCurrentItem(_curWeek);
-		
+
 	}
 
 	@Override
@@ -108,14 +108,17 @@ public class DisplayActivity extends Activity {
 		// TODO Auto-generated method stub
 		if (requestCode == SETTINGS_CODE && resultCode == RESULT_OK) {
 			refresh();
-		}
-		else {
-			initPreferences();
-			initLayout();
-			super.onActivityResult(requestCode, resultCode, data);
+		} else {
+			if (!_preferences.getBoolean("hasData", false)) {
+				this.finish();
+			} else {
+				initPreferences();
+				initLayout();
+				super.onActivityResult(requestCode, resultCode, data);
+			}
 		}
 	}
-	
+
 	/**
 	 * 初始化用户偏好
 	 */
@@ -127,22 +130,24 @@ public class DisplayActivity extends Activity {
 			Intent intent = new Intent(this, SettingsActivity.class);
 			startActivityForResult(intent, SETTINGS_CODE);
 		}
-		
+
 		// 每到星期日，周数加1
-		boolean hasChangedDate = _preferences.getBoolean("hasChangedDate", true);
-		int i = Integer.parseInt(_preferences.getString(getString(R.string.pre_now_week), "1"));
+		boolean hasChangedDate = _preferences
+				.getBoolean("hasChangedDate", true);
+		int i = Integer.parseInt(_preferences.getString(
+				getString(R.string.pre_now_week), "1"));
 		System.out.println(_curWeek + " " + hasChangedDate);
-		
+
 		_nowDate = i;
 		if (!hasChangedDate && _curWeek == 0) {
 			System.out.println("周数加1");
 			Editor editor = _preferences.edit();
-			editor.putString(getString(R.string.pre_now_week), String.valueOf((i+1)%20));
+			editor.putString(getString(R.string.pre_now_week),
+					String.valueOf((i + 1) % 20));
 			editor.putBoolean("hasChangedDate", true);
 			editor.commit();
-			_nowDate = (i+1)%20;
-		}
-		else if (hasChangedDate && _curWeek != 0) {
+			_nowDate = (i + 1) % 20;
+		} else if (hasChangedDate && _curWeek != 0) {
 			System.out.println("周数没变");
 			Editor editor = _preferences.edit();
 			editor.putBoolean("hasChangedDate", false);
@@ -216,7 +221,8 @@ public class DisplayActivity extends Activity {
 		_database = openOrCreateDatabase(DisplayActivity.DATABASE_NAME,
 				Activity.MODE_PRIVATE, null);
 		String sql = "SELECT classname,time,location,teacher FROM timetable where week=? AND classtime=?";
-		Cursor cursor = _database.rawQuery(sql, new String[]{""+week, ""+classtime});
+		Cursor cursor = _database.rawQuery(sql, new String[] { "" + week,
+				"" + classtime });
 
 		// cursor.moveToFirst();
 		Log.w("query", "" + cursor.getCount());
@@ -362,7 +368,6 @@ public class DisplayActivity extends Activity {
 		return page;
 	}
 
-
 	private void createDatabase() {
 		_database = openOrCreateDatabase(DisplayActivity.DATABASE_NAME,
 				Context.MODE_PRIVATE, null);
@@ -385,6 +390,5 @@ public class DisplayActivity extends Activity {
 		// TODO Auto-generated method stub
 		super.onPause();
 	}
-	
 
 }
