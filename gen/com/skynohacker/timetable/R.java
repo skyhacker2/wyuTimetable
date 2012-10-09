@@ -5,10 +5,12 @@
  * should not be modified by hand.
  */
 
-package com.example.timetable;
+package com.skynohacker.timetable;
 
 public final class R {
     public static final class array {
+        public static final int now_weeks=0x7f070001;
+        public static final int now_weeks_value=0x7f070002;
         public static final int week=0x7f070000;
     }
     public static final class attr {
@@ -67,6 +69,7 @@ public final class R {
         public static final int lv5=0x7f0a000e;
         public static final int menu_refresh=0x7f0a0031;
         public static final int menu_settings=0x7f0a0030;
+        public static final int now_week=0x7f0a002f;
         public static final int numberBlock1=0x7f0a0000;
         public static final int numberBlock2=0x7f0a0003;
         public static final int numberBlock3=0x7f0a0006;
@@ -90,7 +93,6 @@ public final class R {
         public static final int timeBlock4=0x7f0a000a;
         public static final int timeBlock5=0x7f0a000d;
         public static final int titlebar=0x7f0a002b;
-        public static final int username=0x7f0a002f;
         public static final int viewPager=0x7f0a002c;
         public static final int week=0x7f0a002e;
     }
@@ -117,6 +119,7 @@ public final class R {
         public static final int menu_settings=0x7f050002;
         public static final int pre_about_content=0x7f05000a;
         public static final int pre_accounts_settings=0x7f050008;
+        public static final int pre_now_week=0x7f05000c;
         public static final int pre_other=0x7f05000b;
         public static final int title_activity_display=0x7f050003;
         public static final int userId=0x7f050004;

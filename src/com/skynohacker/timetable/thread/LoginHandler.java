@@ -59,12 +59,13 @@ public class LoginHandler extends Handler{
 			Toast.makeText(_context, "网络不可用", Toast.LENGTH_LONG).show();
 			break;
 		case FINISH:
-			((DisplayActivity)_context).initLayout();
 			SharedPreferences pre = PreferenceManager.getDefaultSharedPreferences(_context);
 			SharedPreferences.Editor editor = pre.edit();
 			editor.putBoolean("hasData", true);
 			editor.commit();
 			_dialog.dismiss();
+			((DisplayActivity)_context).initPreferences();
+			((DisplayActivity)_context).initLayout();
 			Toast.makeText(_context, "课表已更新", Toast.LENGTH_SHORT).show();
 			break;
 		}

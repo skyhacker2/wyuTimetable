@@ -11,6 +11,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -24,14 +25,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.timetable.R;
+import com.skynohacker.timetable.R;
 import com.skynohacker.timetable.thread.LoginHandler;
 import com.skynohacker.timetable.thread.LoginThread;
 
@@ -44,8 +43,12 @@ public class DisplayActivity extends Activity {
 	private ListView _lv5;
 	private String[] _weeks;
 	private int _curWeek;
+	private String[] _dates;
+	private int _nowDate;
+	
 	private TextView _weekTextView;
-
+	private TextView _nowWeekTextView;
+	
 	private boolean flag = false;
 
 	private ViewPager _viewPager;
@@ -69,15 +72,18 @@ public class DisplayActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		// setContentView(R.layout.activity_display);
-		
+		setContentView(R.layout.main);
+		Calendar cal = Calendar.getInstance();
+		_curWeek = cal.get(Calendar.DAY_OF_WEEK)-1;	// SUNDAY=1, MONDAY=2,...
 		_weeks = getResources().getStringArray(R.array.week);
+		_dates = getResources().getStringArray(R.array.now_weeks);
+		_weeks[_curWeek] += "(今天)";
 		createDatabase();
 		initPreferences();
 		initLayout();
 	}
 	
 	public void initLayout() {
-		setContentView(R.layout.main);
 		_inflater = getLayoutInflater();
 		_viewPagers = new ArrayList<View>();
 
@@ -87,12 +93,14 @@ public class DisplayActivity extends Activity {
 		//_main = (ViewGroup) _inflater.inflate(R.layout.main, null);
 		_viewPager = (ViewPager) findViewById(R.id.viewPager);
 		_weekTextView = (TextView) findViewById(R.id.week);
+		_weekTextView.setText(_weeks[_curWeek]);
+		_nowWeekTextView = (TextView) findViewById(R.id.now_week);
+		_nowWeekTextView.setText(_dates[_nowDate]);
 		//setContentView(_main);
 		_viewPager.setAdapter(new MyPagerAdapter());
 		_viewPager.setOnPageChangeListener(new MyPagerChangeListener());
-		Calendar cal = Calendar.getInstance();
-		_curWeek = cal.get(Calendar.DAY_OF_WEEK)-1;	// SUNDAY=1, MONDAY=2,...
 		_viewPager.setCurrentItem(_curWeek);
+		
 	}
 
 	@Override
@@ -101,14 +109,17 @@ public class DisplayActivity extends Activity {
 		if (requestCode == SETTINGS_CODE && resultCode == RESULT_OK) {
 			refresh();
 		}
-		else
+		else {
+			initPreferences();
+			initLayout();
 			super.onActivityResult(requestCode, resultCode, data);
+		}
 	}
 	
 	/**
 	 * 初始化用户偏好
 	 */
-	private void initPreferences() {
+	public void initPreferences() {
 		_preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		// 判断是否有数据
 		boolean hasData = _preferences.getBoolean("hasData", false);
@@ -116,7 +127,28 @@ public class DisplayActivity extends Activity {
 			Intent intent = new Intent(this, SettingsActivity.class);
 			startActivityForResult(intent, SETTINGS_CODE);
 		}
-
+		
+		// 每到星期日，周数加1
+		boolean hasChangedDate = _preferences.getBoolean("hasChangedDate", true);
+		int i = Integer.parseInt(_preferences.getString(getString(R.string.pre_now_week), "1"));
+		System.out.println(_curWeek + " " + hasChangedDate);
+		
+		_nowDate = i;
+		if (!hasChangedDate && _curWeek == 0) {
+			System.out.println("周数加1");
+			Editor editor = _preferences.edit();
+			editor.putString(getString(R.string.pre_now_week), String.valueOf((i+1)%20));
+			editor.putBoolean("hasChangedDate", true);
+			editor.commit();
+			_nowDate = (i+1)%20;
+		}
+		else if (hasChangedDate && _curWeek != 0) {
+			System.out.println("周数没变");
+			Editor editor = _preferences.edit();
+			editor.putBoolean("hasChangedDate", false);
+			editor.commit();
+		}
+		System.out.println(_nowDate);
 	}
 
 	class MyPagerAdapter extends PagerAdapter {

@@ -5,7 +5,10 @@
     
     <PreferenceCategory android:title="@string/pre_accounts_settings"><EditTextPreference android:key="@string/userId" android:title="学号" android:summary="请输入学号" android:dialogTitle="请输入学号" android:positiveButtonText="确定" android:negativeButtonText="取消" /><EditTextPreference android:key="@string/userPw" android:title="密码" android:summary="请输入学生服务系统密码" android:dialogTitle="请输入密码" android:positiveButtonText="确定" android:negativeButtonText="取消" />
     
-</PreferenceCategory>
+    
+    
+    
+</PreferenceCategory><PreferenceCategory android:title="时间设置"><ListPreference android:summary="设置现在是第几周" android:key="@string/pre_now_week" android:entryValues="@array/now_weeks_value" android:title="第一周" android:entries="@array/now_weeks" android:dialogTitle="请选择" /></PreferenceCategory>
 <PreferenceCategory android:title="@string/pre_other"><Preference android:title="关于" android:key="@string/about" android:summary="作者信息" /></PreferenceCategory>
     
 
