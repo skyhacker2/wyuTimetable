@@ -1,5 +1,8 @@
 package com.skynohacker.timetable.activity;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -14,27 +17,44 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockDialogFragment;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.SubMenu;
+import com.actionbarsherlock.widget.ShareActionProvider;
 import com.skynohacker.timetable.R;
+import com.skynohacker.timetable.services.TimetableService;
 import com.skynohacker.timetable.thread.LoginHandler;
 import com.skynohacker.timetable.thread.LoginThread;
 
-public class DisplayActivity extends Activity {
+public class DisplayActivity extends SherlockActivity implements
+		ActionBar.OnNavigationListener {
 
 	private ListView _lv1;
 	private ListView _lv2;
@@ -46,21 +66,11 @@ public class DisplayActivity extends Activity {
 	private String[] _dates;
 	private int _nowDate;
 
-	private TextView _weekTextView;
-	private TextView _nowWeekTextView;
-
-	private boolean flag = false;
-
 	private ViewPager _viewPager;
 	private ArrayList<View> _viewPagers;
-	private ViewGroup _main;
 	private LayoutInflater _inflater;
 
 	private SharedPreferences _preferences;
-
-	private static final int PROGRESS_DIALOG_ID = 0;
-	private static final int WRONG_DIALOG_ID = 1;
-	private static final int TIMEOUT_DIALOG_ID = 2;
 
 	private SQLiteDatabase _database;
 	public static final String DATABASE_NAME = "Timetable.db";
@@ -71,32 +81,38 @@ public class DisplayActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		// setContentView(R.layout.activity_display);
 		setContentView(R.layout.main);
+		startService(new Intent(this, TimetableService.class));
 		Calendar cal = Calendar.getInstance();
 		_curWeek = cal.get(Calendar.DAY_OF_WEEK) - 1; // SUNDAY=1, MONDAY=2,...
 		_weeks = getResources().getStringArray(R.array.week);
 		_dates = getResources().getStringArray(R.array.now_weeks);
-		_weeks[_curWeek] += "(今天)";
+		_weeks[_curWeek] += "*";
 		createDatabase();
 		initPreferences();
 		initLayout();
 	}
 
 	public void initLayout() {
-		_inflater = getLayoutInflater();
-		_viewPagers = new ArrayList<View>();
+		Context context = getSupportActionBar().getThemedContext();
+		ArrayAdapter<CharSequence> list = new ArrayAdapter<CharSequence>(
+				context, R.layout.sherlock_spinner_item, _weeks);
+		list.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
 
+		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+		getSupportActionBar().setListNavigationCallbacks(list, this);
+		getSupportActionBar().setTitle(_dates[_nowDate]);
+		getSupportActionBar().setHomeButtonEnabled(true);
+		getSupportActionBar().setSelectedNavigationItem(_curWeek);
+
+		_inflater = getLayoutInflater();
+		_viewPager = (ViewPager) findViewById(R.id.viewPager);
+
+		_viewPagers = new ArrayList<View>();
 		for (int i = 0; i < 7; i++)
 			_viewPagers.add(getView(i));
-
-		// _main = (ViewGroup) _inflater.inflate(R.layout.main, null);
-		_viewPager = (ViewPager) findViewById(R.id.viewPager);
-		_weekTextView = (TextView) findViewById(R.id.week);
-		_weekTextView.setText(_weeks[_curWeek]);
-		_nowWeekTextView = (TextView) findViewById(R.id.now_week);
-		_nowWeekTextView.setText(_dates[_nowDate]);
-		// setContentView(_main);
+		_viewPagers.add(getAllClassView());
+		_viewPager.setDrawingCacheEnabled(true);
 		_viewPager.setAdapter(new MyPagerAdapter());
 		_viewPager.setOnPageChangeListener(new MyPagerChangeListener());
 		_viewPager.setCurrentItem(_curWeek);
@@ -109,14 +125,14 @@ public class DisplayActivity extends Activity {
 		if (requestCode == SETTINGS_CODE && resultCode == RESULT_OK) {
 			refresh();
 		} else {
-			if (!_preferences.getBoolean("hasData", false)) {
+			if (_preferences.getBoolean("hasData", false) == false)
 				this.finish();
-			} else {
+			else {
 				initPreferences();
 				initLayout();
-				super.onActivityResult(requestCode, resultCode, data);
 			}
 		}
+		super.onActivityResult(requestCode, resultCode, data);
 	}
 
 	/**
@@ -127,33 +143,24 @@ public class DisplayActivity extends Activity {
 		// 判断是否有数据
 		boolean hasData = _preferences.getBoolean("hasData", false);
 		if (!hasData) {
+			long now_day = System.currentTimeMillis() / 1000 / 60 / 60 / 24;
+			Editor editor = _preferences.edit();
+			editor.putLong("start_day", now_day);
+			editor.commit();
 			Intent intent = new Intent(this, SettingsActivity.class);
 			startActivityForResult(intent, SETTINGS_CODE);
-		}
-
-		// 每到星期日，周数加1
-		boolean hasChangedDate = _preferences
-				.getBoolean("hasChangedDate", true);
-		int i = Integer.parseInt(_preferences.getString(
-				getString(R.string.pre_now_week), "1"));
-		System.out.println(_curWeek + " " + hasChangedDate);
-
-		_nowDate = i;
-		if (!hasChangedDate && _curWeek == 0) {
-			System.out.println("周数加1");
+		} else {
+			Calendar c = Calendar.getInstance();
+			long now_day = c.getTimeInMillis() / 1000 / 60 / 60 / 24;
+			long start_day = _preferences.getLong("start_day", 0);
+			_nowDate = (int) ((now_day - start_day) / 7);
+			_nowDate = _nowDate % 20;
+			System.out.printf("现在是第%d周\n", _nowDate);
 			Editor editor = _preferences.edit();
 			editor.putString(getString(R.string.pre_now_week),
-					String.valueOf((i + 1) % 20));
-			editor.putBoolean("hasChangedDate", true);
-			editor.commit();
-			_nowDate = (i + 1) % 20;
-		} else if (hasChangedDate && _curWeek != 0) {
-			System.out.println("周数没变");
-			Editor editor = _preferences.edit();
-			editor.putBoolean("hasChangedDate", false);
+					String.valueOf(_nowDate));
 			editor.commit();
 		}
-		System.out.println(_nowDate);
 	}
 
 	class MyPagerAdapter extends PagerAdapter {
@@ -200,8 +207,10 @@ public class DisplayActivity extends Activity {
 		}
 
 		@Override
-		public void onPageSelected(int arg0) {
-			_weekTextView.setText(_weeks[arg0]);
+		public void onPageSelected(int index) {
+			// _weekTextView.setText(_weeks[arg0]);
+			getSupportActionBar().setSelectedNavigationItem(index);
+
 		}
 
 	}
@@ -242,7 +251,43 @@ public class DisplayActivity extends Activity {
 				cursor.moveToNext();
 			}
 		} else {
-			map.put("className", "空闲时间");
+			map.put("className", "");
+			list.add(map);
+		}
+		_database.close();
+		return list;
+	}
+
+	/**
+	 * 
+	 * @param classtime
+	 *            第几节课
+	 * @return
+	 */
+	private List<Map<String, Object>> getData() {
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+		_database = openOrCreateDatabase(DisplayActivity.DATABASE_NAME,
+				Activity.MODE_PRIVATE, null);
+		String sql = "SELECT classname,time,location,teacher FROM timetable where week=? AND classtime=?";
+		for (int i = 1; i <= 5; i++) {
+			Map<String, Object> map = new HashMap<String, Object>();
+			int index = 0;
+			for (int week = 0; week < 7; week++) {
+				Cursor cursor = _database.rawQuery(sql, new String[] {
+						"" + week, "" + i });
+				if (cursor.getCount() > 0) {
+					cursor.moveToFirst();
+					int classname = cursor.getColumnIndex("classname");
+					map.put("time", "" + i);
+					String content = "";
+					while (!cursor.isAfterLast()) {
+						content = content + '\n' + cursor.getString(classname);
+						cursor.moveToNext();
+					}
+					map.put("" + index, content);
+				}
+				index++;
+			}
 			list.add(map);
 		}
 		_database.close();
@@ -251,7 +296,27 @@ public class DisplayActivity extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.activity_display, menu);
+
+		// getMenuInflater().inflate(R.menu.activity_display, menu);
+		SubMenu subMenu = menu.addSubMenu("Action menu");
+		MenuInflater menuInflater = new MenuInflater(this);
+		menuInflater.inflate(R.menu.activity_display, subMenu);
+		MenuItem menuItem = subMenu.getItem();
+		menuItem.setIcon(R.drawable.abs__ic_menu_moreoverflow_normal_holo_light)
+				.setShowAsAction(
+						MenuItem.SHOW_AS_ACTION_ALWAYS
+								| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+		Intent shareIntent = new Intent(Intent.ACTION_SEND);
+		shareIntent.setType("image/*");
+		ShareActionProvider actionProvider = new ShareActionProvider(this);
+		actionProvider.setShareIntent(shareIntent);
+		Uri uri = Uri.fromFile(getFileStreamPath("share.png"));
+		shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+
+		MenuItem shareMenu = menu
+				.findItem(R.id.menu_item_share_action_provider_action_bar);
+		shareMenu.setActionProvider(actionProvider);
+
 		return true;
 	}
 
@@ -265,6 +330,34 @@ public class DisplayActivity extends Activity {
 		case R.id.menu_settings:
 			Intent intent = new Intent(this, SettingsActivity.class);
 			startActivityForResult(intent, SETTINGS_CODE);
+			return true;
+		case android.R.id.home:
+			Toast.makeText(this, "益达课表2.0", Toast.LENGTH_SHORT).show();
+			return true;
+		case R.id.menu_item_share_action_provider_action_bar:
+			View view = getWindow().getDecorView();
+			view.setDrawingCacheEnabled(true);
+			Bitmap bm = view.getDrawingCache();
+			Rect frame = new Rect();
+			getWindow().getDecorView().getWindowVisibleDisplayFrame(frame);
+			int statusHeight = frame.top; // 获得状态栏高度
+			bm = bm.createBitmap(bm, 0, statusHeight, bm.getWidth(),
+					bm.getHeight() - statusHeight);
+			FileOutputStream outputStream = null;
+			try {
+				outputStream = openFileOutput("share.png",
+						Context.MODE_WORLD_READABLE);
+				if (bm == null)
+					System.out.println("bm==null");
+				bm.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+				outputStream.close();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -283,6 +376,7 @@ public class DisplayActivity extends Activity {
 		LoginHandler handler = new LoginHandler(this, dialog);
 		LoginThread thread = new LoginThread(this, handler, userid, userpw);
 		thread.start();
+		SherlockDialogFragment sherlockDialog = new SherlockDialogFragment();
 	}
 
 	/***
@@ -314,13 +408,19 @@ public class DisplayActivity extends Activity {
 
 	public View getView(int i) {
 
-		View page = _inflater.inflate(R.layout.activity_display, null);
+		View page = _inflater.inflate(R.layout.activity_display2, null);
 
 		_lv1 = (ListView) page.findViewById(R.id.lv1);
 		_lv2 = (ListView) page.findViewById(R.id.lv2);
 		_lv3 = (ListView) page.findViewById(R.id.lv3);
 		_lv4 = (ListView) page.findViewById(R.id.lv4);
 		_lv5 = (ListView) page.findViewById(R.id.lv5);
+		_lv1.setOnItemClickListener(new OnItemClickListener(1, i));
+		_lv2.setOnItemClickListener(new OnItemClickListener(2, i));
+		_lv3.setOnItemClickListener(new OnItemClickListener(3, i));
+		_lv4.setOnItemClickListener(new OnItemClickListener(4, i));
+		_lv5.setOnItemClickListener(new OnItemClickListener(5, i));
+
 		_lv1.setAdapter(new SimpleAdapter(
 				this,
 				getData(i, 1),
@@ -333,36 +433,36 @@ public class DisplayActivity extends Activity {
 		_lv2.setAdapter(new SimpleAdapter(
 				this,
 				getData(i, 2),
-				R.layout.item2,
+				R.layout.item1,
 				new String[] { "className", "teacherName", "time", "location" },
-				new int[] { R.id.className2, R.id.teacherName2, R.id.time2,
-						R.id.location2 }));
+				new int[] { R.id.className1, R.id.teacherName1, R.id.time1,
+						R.id.location1 }));
 		setListViewHeightBasedOnChildren(_lv2);
 		_lv3.setAdapter(new SimpleAdapter(
 				this,
 				getData(i, 3),
-				R.layout.item3,
+				R.layout.item1,
 				new String[] { "className", "teacherName", "time", "location" },
-				new int[] { R.id.className3, R.id.teacherName3, R.id.time3,
-						R.id.location3 }));
+				new int[] { R.id.className1, R.id.teacherName1, R.id.time1,
+						R.id.location1 }));
 		setListViewHeightBasedOnChildren(_lv3);
 
 		_lv4.setAdapter(new SimpleAdapter(
 				this,
 				getData(i, 4),
-				R.layout.item4,
+				R.layout.item1,
 				new String[] { "className", "teacherName", "time", "location" },
-				new int[] { R.id.className4, R.id.teacherName4, R.id.time4,
-						R.id.location4 }));
+				new int[] { R.id.className1, R.id.teacherName1, R.id.time1,
+						R.id.location1 }));
 		setListViewHeightBasedOnChildren(_lv4);
 
 		_lv5.setAdapter(new SimpleAdapter(
 				this,
 				getData(i, 5),
-				R.layout.item5,
+				R.layout.item1,
 				new String[] { "className", "teacherName", "time", "location" },
-				new int[] { R.id.className5, R.id.teacherName5, R.id.time5,
-						R.id.location5 }));
+				new int[] { R.id.className1, R.id.teacherName1, R.id.time1,
+						R.id.location1 }));
 		setListViewHeightBasedOnChildren(_lv5);
 
 		return page;
@@ -378,6 +478,7 @@ public class DisplayActivity extends Activity {
 		if (c.getCount() > 0) {
 			return;
 		}
+		c.close();
 		String create_table = String
 				.format("CREATE TABLE %s (classname TEXT, time TEXT, location TEXT, teacher TEXT, week INTEGER, classtime INTEGER)",
 						DisplayActivity.TABLE_NAME);
@@ -389,6 +490,67 @@ public class DisplayActivity extends Activity {
 	protected void onPause() {
 		// TODO Auto-generated method stub
 		super.onPause();
+	}
+
+	@Override
+	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+		// TODO Auto-generated method stub
+		_viewPager.setCurrentItem(itemPosition);
+		return false;
+	}
+
+	public View getAllClassView() {
+		String[] from = new String[] { "time", "0", "1", "2", "3", "4", "5",
+				"6" };
+		int[] to = new int[] { R.id.time_label, R.id.classname0_label,
+				R.id.classname1_label, R.id.classname2_label,
+				R.id.classname3_label, R.id.classname4_label,
+				R.id.classname5_label, R.id.classname6_label };
+
+		List<Map<String, Object>> list = getData();
+		/*
+		 * if (list == null) System.out.println("list is null"); for
+		 * (Map<String, Object> map : list) { for (int i = 0; i < from.length;
+		 * i++) System.out.println(map.get(from[i])); }
+		 */
+
+		View page = _inflater.inflate(R.layout.all_class, null);
+		ListView listView = (ListView) page.findViewById(R.id.all_list_view);
+		SimpleAdapter adapter = new SimpleAdapter(this, list,
+				R.layout.all_list_content, from, to);
+		listView.setAdapter(adapter);
+
+		return page;
+	}
+
+	/**
+	 * listview OnItemSelectedListener
+	 * 
+	 * @author skyhacker
+	 * 
+	 */
+	class OnItemClickListener implements
+			android.widget.AdapterView.OnItemClickListener {
+		private int _time;
+		private int _week;
+
+		public OnItemClickListener(int time, int week) {
+			_time = time;
+			_week = week;
+		}
+
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position,
+				long id) {
+			Intent intent = new Intent(DisplayActivity.this,
+					DetailActivity.class);
+			intent.putExtra("week", _week);
+			intent.putExtra("time", _time);
+			DisplayActivity.this.startActivity(intent);
+			Log.v("OnItemClickListener", "_time=" + _time + " _week=" + _week);
+
+		}
+
 	}
 
 }

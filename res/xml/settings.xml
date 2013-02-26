@@ -1,15 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
-    
-    
-    
-    <PreferenceCategory android:title="@string/pre_accounts_settings"><EditTextPreference android:key="@string/userId" android:title="学号" android:summary="请输入学号" android:dialogTitle="请输入学号" android:positiveButtonText="确定" android:negativeButtonText="取消" /><EditTextPreference android:key="@string/userPw" android:title="密码" android:summary="请输入学生服务系统密码" android:dialogTitle="请输入密码" android:positiveButtonText="确定" android:negativeButtonText="取消" />
-    
-    
-    
-    
-</PreferenceCategory><PreferenceCategory android:title="时间设置"><ListPreference android:summary="设置现在是第几周" android:key="@string/pre_now_week" android:entryValues="@array/now_weeks_value" android:title="第一周" android:entries="@array/now_weeks" android:dialogTitle="请选择" /></PreferenceCategory>
-<PreferenceCategory android:title="@string/pre_other"><Preference android:title="关于" android:key="@string/about" android:summary="作者信息" /></PreferenceCategory>
-    
+
+    <PreferenceCategory android:title="@string/pre_accounts_settings" >
+        <EditTextPreference
+            android:dialogTitle="请输入学号"
+            android:key="@string/userId"
+            android:negativeButtonText="取消"
+            android:positiveButtonText="确定"
+            android:summary="请输入学号"
+            android:title="学号" />
+        <EditTextPreference
+            android:dialogTitle="请输入密码"
+            android:key="@string/userPw"
+            android:negativeButtonText="取消"
+            android:positiveButtonText="确定"
+            android:summary="请输入学生服务系统密码"
+            android:title="密码" 
+            android:password="true"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="时间设置" >
+        <ListPreference
+            android:dialogTitle="请选择"
+            android:entries="@array/now_weeks"
+            android:entryValues="@array/now_weeks_value"
+            android:key="@string/pre_now_week"
+            android:summary="设置现在是第几周"
+            android:title="第一周" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pre_other" >
+        <Preference
+            android:key="@string/about"
+            android:summary="作者信息"
+            android:title="关于" />
+    </PreferenceCategory>
 
 </PreferenceScreen>

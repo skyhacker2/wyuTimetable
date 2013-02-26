@@ -1,6 +1,23 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/menu_settings"
-        android:title="@string/menu_settings"
-        android:orderInCategory="100" />
-    <item android:id="@+id/menu_refresh" android:title="@string/menu_refresh" android:orderInCategory="100"></item>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_settings"
+        android:icon="@drawable/ic_compose_inverse"
+        android:orderInCategory="100"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_settings"/>
+    <item
+        android:id="@+id/menu_refresh"
+        android:icon="@drawable/ic_refresh_inverse"
+        android:orderInCategory="100"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_refresh">
+    </item>
+    <item
+        android:id="@+id/menu_item_share_action_provider_action_bar"
+        android:actionProviderClass="com.actionbarsherlock.widget.ShareActionProvider"
+        android:showAsAction="always"
+        android:icon="@drawable/abs__ic_menu_share_holo_light"
+        android:title="@string/action_bar_share_with"/>
+
 </menu>

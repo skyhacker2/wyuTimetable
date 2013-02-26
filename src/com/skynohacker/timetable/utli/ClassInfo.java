@@ -19,7 +19,7 @@ public class ClassInfo {
 		this.classtime = classtime;
 	}
 	public ClassInfo(int week, int classtime) {
-		this.classname = "空闲时间";
+		this.classname = "";
 		this.time = "";
 		this.location = "";
 		this.teacher = "";

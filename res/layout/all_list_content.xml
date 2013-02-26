@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="90dp"
+    android:orientation="horizontal" >
+
+    <TextView
+        android:id="@+id/time_label"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="textView" 
+        android:background="#FFFFFF"/>
+
+    <TextView
+        android:id="@+id/classname0_label"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="textView"
+        style="@style/ClassCell"
+        android:background="#f0f0f0"
+        />
+
+    <TextView
+        android:id="@+id/classname1_label"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="textView" 
+        style="@style/ClassCell"
+        android:background="#FFFFFF"/>
+
+    <TextView
+        android:id="@+id/classname2_label"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="textView" 
+        style="@style/ClassCell"
+        android:background="#f0f0f0"/>
+
+    <TextView
+        android:id="@+id/classname3_label"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="textView" 
+        style="@style/ClassCell"
+        android:background="#ffffff"/>
+
+    <TextView
+        android:id="@+id/classname4_label"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="textView" 
+        style="@style/ClassCell"
+        android:background="#f0f0f0"/>
+
+    <TextView
+        android:id="@+id/classname5_label"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="textView" 
+        style="@style/ClassCell"
+        android:background="#ffffff"/>
+
+    <TextView
+        android:id="@+id/classname6_label"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="textView" 
+        style="@style/ClassCell"
+        android:background="#f0f0f0"/>
+
+</LinearLayout>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" 
+    android:background="@drawable/abs__menu_dropdown_panel_holo_light">
+
+    <include
+        android:id="@+id/day_names"
+        layout="@layout/week_header" />
+
+    <ListView
+        android:id="@+id/all_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:cacheColorHint="#00000000" 
+        android:clickable="false"
+        >
+    </ListView>
+
+</LinearLayout>

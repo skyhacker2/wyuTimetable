@@ -4,82 +4,93 @@
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">设置</string>
     <string name="title_activity_display">益达课表</string>
-    <color name="item1_bg1">#aa33B5E5</color>
-    <color name="item1_bg2">#aa0099CC</color>
-    <color name="item2_bg1">#aaAA66CC</color>
-    <color name="item2_bg2">#aa9933CC</color>
-    <color name="item3_bg1">#aa99CC00</color>
-    <color name="item3_bg2">#aa669900</color>
-    <color name="item4_bg1">#aaFFBB33</color>
-    <color name="item4_bg2">#aaFF8800</color>
-    <color name="item5_bg1">#aaFF4444</color>
-    <color name="item5_bg2">#aaCC0000</color>
-    <color name="classNameColor">#e6e6e6</color>
+
+    <color name="item1_bg1">#33B5E5</color>
+    <color name="item1_bg2">#0099CC</color>
+    <color name="item2_bg1">#AA66CC</color>
+    <color name="item2_bg2">#9933CC</color>
+    <color name="item3_bg1">#99CC00</color>
+    <color name="item3_bg2">#669900</color>
+    <color name="item4_bg1">#FFBB33</color>
+    <color name="item4_bg2">#FF8800</color>
+    <color name="item5_bg1">#FF4444</color>
+    <color name="item5_bg2">#CC0000</color>
+    <color name="classNameColor">#222222</color>
     <color name="defaultTextColor">#000000</color>
     <color name="bg_alpha">#77ffffff</color>
+
     <string name="userId">user_id</string>
     <string name="userPw">user_pw</string>
     <string name="hasData">has_data</string>
-    <string name="menu_refresh">刷新课表</string>
+    <string name="menu_refresh">刷新</string>
+
     <string-array name="week">
-        <item >星期日</item>
-        <item >星期一</item>
-        <item >星期二</item>
-        <item >星期三</item>
-        <item >星期四</item>
-        <item >星期五</item>
-        <item >星期六</item>
-        <item />
+        <item>周日</item>
+        <item>周一</item>
+        <item>周二</item>
+        <item>周三</item>
+        <item>周四</item>
+        <item>周五</item>
+        <item>周六</item>
+        <item>全部</item>
     </string-array>
+
     <color name="titlebar_bg">#232323</color>
+
     <string name="pre_accounts_settings">账号设置</string>
     <string name="about">about</string>
-    <string name="pre_about_content">这是一款自由开源的邑大课程表软件\n作者: @SkyNoHacker\nweibo: @SkyNoHacker</string>
+    <string name="pre_about_content">这是一款开源的邑大课程表软件\n作者: @NovemberEleven1111</string>
     <string name="pre_other">其他</string>
     <string name="pre_now_week">pre_now_week</string>
+
     <string-array name="now_weeks">
-        <item >第1周</item>
-        <item >第2周</item>
-        <item >第3周</item>
-        <item >第4周</item>
-        <item >第5周</item>
-        <item >第6周</item>
-        <item >第7周</item>
-        <item >第8周</item>
-        <item >第9周</item>
-        <item >第10周</item>
-        <item >第11周</item>
-        <item >第12周</item>
-        <item >第13周</item>
-        <item >第14周</item>
-        <item >第15周</item>
-        <item >第16周</item>
-        <item >第17周</item>
-        <item >第18周</item>
-        <item >第19周</item>
-        <item >第20周</item>
+        <item>第1周</item>
+        <item>第2周</item>
+        <item>第3周</item>
+        <item>第4周</item>
+        <item>第5周</item>
+        <item>第6周</item>
+        <item>第7周</item>
+        <item>第8周</item>
+        <item>第9周</item>
+        <item>第10周</item>
+        <item>第11周</item>
+        <item>第12周</item>
+        <item>第13周</item>
+        <item>第14周</item>
+        <item>第15周</item>
+        <item>第16周</item>
+        <item>第17周</item>
+        <item>第18周</item>
+        <item>第19周</item>
+        <item>第20周</item>
     </string-array>
     <string-array name="now_weeks_value">
-        <item>0</item><item >1</item>
-        <item >2</item>
-        <item >3</item>
-        <item >4</item>
-        <item >5</item>
-        <item >6</item>
-        <item >7</item>
-        <item >8</item>
-        <item >9</item>
-        <item >10</item>
-        <item >11</item>
-        <item >12</item>
-        <item >13</item>
-        <item >14</item>
-        <item >15</item>
-        <item >16</item>
-        <item >17</item>
-        <item >18</item>
-        <item >19</item>
-        
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+        <item>17</item>
+        <item>18</item>
+        <item>19</item>
     </string-array>
+
+    <color name="itemx_bg1">#dddddd</color>
+    <color name="itemx_bg2">#dadada</color>
+
+    <string name="action_bar_share_with">分享</string>
 
 </resources>
