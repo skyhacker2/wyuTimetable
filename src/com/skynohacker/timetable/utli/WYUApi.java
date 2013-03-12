@@ -98,14 +98,6 @@ public class WYUApi {
 		HttpClient httpClient = new DefaultHttpClient();
 		// 设置连接超时时间
 		httpClient.getParams().setIntParameter("http.socket.timeout", 10000);
-
-		if (isWap) {
-			Log.v("proxy", "yes");
-			// HttpHost httpHost = new HttpHost(host, port);
-			HttpHost httpHost = new HttpHost("10.0.0.172", 80, "http");
-			httpClient.getParams().setParameter(ConnRouteParams.DEFAULT_PROXY,
-					httpHost);
-		}
 		HttpGet httpGet = new HttpGet("http://jwc.wyu.edu.cn/student/rndnum.asp");
 		httpClient.execute(httpGet);
 		httpClient.getConnectionManager().shutdown();
@@ -116,12 +108,14 @@ public class WYUApi {
 		// 查找验证码的cookie在list的位置
 		int pos = 0;
 		for (int i = 0; i < cookies.size(); i++) {
-			if (cookies.get(i).getName() == "LogonNumber") {
+			if (cookies.get(i).getName().equals("LogonNumber")) {
 				pos = i;
-				break;
 			}
+			Log.v("cookies", cookies.get(i).getName() + ": " + cookies.get(i).getValue());
 		}
-
+		Log.v("验证码","" +cookies.get(pos));
+		Log.v("用户名", mUserID);
+		Log.v("密码", mUserPwd);
 		// 构建post报头
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("UserCode", mUserID));
@@ -136,7 +130,7 @@ public class WYUApi {
 				"http://jwc.wyu.edu.cn/student/logon.asp");
 		httpPost.setEntity(entity);
 
-		// 设置httpClient参数，不自动重定向
+		//设置httpClient参数，不自动重定向
 		HttpParams httpParams = new BasicHttpParams();
 		HttpClientParams.setRedirecting(httpParams, false);
 
@@ -145,18 +139,18 @@ public class WYUApi {
 		httpClient2.getParams().setIntParameter("http.socket.timeout", 10000);
 		httpClient2.setCookieStore(mCookieStore);
 
-		if (isWap) {
-			// HttpHost httpHost = new HttpHost(host, port);
-			HttpHost httpHost = new HttpHost("10.0.0.172", 80, "http");
-			httpClient2.getParams().setParameter(ConnRouteParams.DEFAULT_PROXY,
-					httpHost);
-			Log.v("wap", "true");
-		}
 
 		HttpContext localContext = new BasicHttpContext();
 
 		// 登录
 		HttpResponse response = httpClient2.execute(httpPost, localContext);
+		HttpEntity loginEntity = response.getEntity();
+		if (loginEntity != null) {
+			String str = new String(EntityUtils.toString(loginEntity).getBytes(
+					"ISO-8859-1"), "GB2312");
+			Log.v("html_size", "" + str.length());
+			Log.v("html_content", str);
+		}
 		httpClient2.getConnectionManager().shutdown();
 		Log.v("response", response.getStatusLine().toString());
 
@@ -182,12 +176,6 @@ public class WYUApi {
 		// 设置超时
 		httpClient.getParams().setIntParameter("http.socket.timeout", 20000);
 		((DefaultHttpClient) httpClient).setCookieStore(mCookieStore);
-		if (isWap) {
-			// HttpHost httpHost = new HttpHost(host, port);
-			HttpHost httpHost = new HttpHost("10.0.0.172", 80, "http");
-			httpClient.getParams().setParameter(ConnRouteParams.DEFAULT_PROXY,
-					httpHost);
-		}
 
 		HttpResponse response;
 		try {
@@ -209,7 +197,10 @@ public class WYUApi {
 		} finally{
 			httpClient.getConnectionManager().shutdown();
 		}
-		return WYUParser.parseTimetable(mHtml);
+		if (mHtml.contains("top.location.href"))
+			return null;
+		else
+			return WYUParser.parseTimetable(mHtml);
 		
 	}
 

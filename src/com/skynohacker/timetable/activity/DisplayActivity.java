@@ -8,6 +8,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TooManyListenersException;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -101,7 +102,7 @@ public class DisplayActivity extends SherlockActivity implements
 
 		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		getSupportActionBar().setListNavigationCallbacks(list, this);
-		getSupportActionBar().setTitle(_dates[_nowDate]);
+		getSupportActionBar().setTitle("课表");
 		getSupportActionBar().setHomeButtonEnabled(true);
 		getSupportActionBar().setSelectedNavigationItem(_curWeek);
 
@@ -125,12 +126,9 @@ public class DisplayActivity extends SherlockActivity implements
 		if (requestCode == SETTINGS_CODE && resultCode == RESULT_OK) {
 			refresh();
 		} else {
-			if (_preferences.getBoolean("hasData", false) == false)
-				this.finish();
-			else {
+			if (_preferences.getBoolean("hasData", false) == true)	
 				initPreferences();
 				initLayout();
-			}
 		}
 		super.onActivityResult(requestCode, resultCode, data);
 	}
@@ -296,15 +294,15 @@ public class DisplayActivity extends SherlockActivity implements
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-
+		menu.add(_dates[_nowDate]).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		// getMenuInflater().inflate(R.menu.activity_display, menu);
-		SubMenu subMenu = menu.addSubMenu("Action menu");
+		SubMenu subMenu = menu.addSubMenu("更多");
 		MenuInflater menuInflater = new MenuInflater(this);
 		menuInflater.inflate(R.menu.activity_display, subMenu);
 		MenuItem menuItem = subMenu.getItem();
 		menuItem.setIcon(R.drawable.abs__ic_menu_moreoverflow_normal_holo_light)
 				.setShowAsAction(
-						MenuItem.SHOW_AS_ACTION_ALWAYS
+						MenuItem.SHOW_AS_ACTION_IF_ROOM
 								| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		Intent shareIntent = new Intent(Intent.ACTION_SEND);
 		shareIntent.setType("image/*");
@@ -316,13 +314,13 @@ public class DisplayActivity extends SherlockActivity implements
 		MenuItem shareMenu = menu
 				.findItem(R.id.menu_item_share_action_provider_action_bar);
 		shareMenu.setActionProvider(actionProvider);
-
+		
 		return true;
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// TODO Auto-generated method stub
+
 		switch (item.getItemId()) {
 		case R.id.menu_refresh:
 			refresh();
@@ -332,7 +330,7 @@ public class DisplayActivity extends SherlockActivity implements
 			startActivityForResult(intent, SETTINGS_CODE);
 			return true;
 		case android.R.id.home:
-			Toast.makeText(this, "益达课表2.0", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, "益达课表2.2", Toast.LENGTH_SHORT).show();
 			return true;
 		case R.id.menu_item_share_action_provider_action_bar:
 			View view = getWindow().getDecorView();
@@ -364,6 +362,14 @@ public class DisplayActivity extends SherlockActivity implements
 		}
 
 	}
+	
+
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		//Toast.makeText(this, "onPrepareOptionMenu", Toast.LENGTH_SHORT).show();
+		
+		return super.onPrepareOptionsMenu(menu);
+	}
 
 	/**
 	 * 刷新课表
@@ -372,7 +378,7 @@ public class DisplayActivity extends SherlockActivity implements
 		String userid = _preferences.getString(getString(R.string.userId), "");
 		String userpw = _preferences.getString(getString(R.string.userPw), "");
 		ProgressDialog dialog = new ProgressDialog(this);
-		dialog.setTitle("请稍后");
+		
 		LoginHandler handler = new LoginHandler(this, dialog);
 		LoginThread thread = new LoginThread(this, handler, userid, userpw);
 		thread.start();

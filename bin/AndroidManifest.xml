@@ -1,7 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.skynohacker.timetable"
+    android:installLocation="auto"
     android:versionCode="2"
-    android:versionName="2.1" >
+    android:versionName="2.2" >
 
     <uses-sdk
         android:minSdkVersion="8"
@@ -35,20 +36,27 @@
             android:theme="@style/Theme.Sherlock.Light"
             android:uiOptions="splitActionBarWhenNarrow" >
         </activity>
-        <receiver android:name=".provider.TimeAppWidgetProvider">
+
+        <receiver android:name=".provider.TimeAppWidgetProvider" >
             <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
-            <meta-data android:name="android.appwidget.provider"
-                android:resource="@xml/timetable_appwidget_info"/>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/timetable_appwidget_info" />
         </receiver>
-        <service android:name=".services.TimetableService"></service>
-        <receiver android:name=".provider.TimetableReceiver">
-            <intent-filter >
-                <action android:name="android.intent.action.SCREEN_ON"/>
+
+        <service android:name=".services.TimetableService" >
+        </service>
+
+        <receiver android:name=".provider.TimetableReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.SCREEN_ON" />
                 <action android:name="android.intent.action.SCREEN_OFF" />
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <category android:name="android.intent.category.HOME"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+
+                <category android:name="android.intent.category.HOME" />
             </intent-filter>
         </receiver>
     </application>

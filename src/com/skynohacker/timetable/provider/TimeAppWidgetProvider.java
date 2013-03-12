@@ -11,10 +11,12 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -26,7 +28,7 @@ public class TimeAppWidgetProvider extends AppWidgetProvider {
 
 	SQLiteDatabase _database;
 	static int _curIndex = 1;
-	static String _curWeek = "第一周";
+	static String _curWeek = "第1周";
 	final static String ACTION_PREVIOUS_CLASS = "com.skynohacker.timeable.action_previous_class";
 	final static String ACTION_NEXT_CLASS = "com.skynohacker.timetable.action_next_class";
 	final static String ACTION_UPDATE = "com.skynohacker.timetable.update_appwidget";
@@ -80,7 +82,7 @@ public class TimeAppWidgetProvider extends AppWidgetProvider {
 			views.setOnClickPendingIntent(R.id.appwidget_content, pendingIntent);
 			views.setTextViewText(R.id.appwidget_content, content);
 			views.setTextViewText(R.id.appwidget_title, "" + _curIndex );
-			views.setTextViewText(R.id.appwidget_time, weeks[day] + "\n" + _curWeek);
+			views.setTextViewText(R.id.appwidget_time, weeks[day] + "\n" + getWeek(context));
 			Intent intent2 = new Intent(context, TimeAppWidgetProvider.class);
 			intent2.setAction(ACTION_PREVIOUS_CLASS);
 			PendingIntent pi2 = PendingIntent.getBroadcast(context, 0, intent2,
@@ -119,10 +121,26 @@ public class TimeAppWidgetProvider extends AppWidgetProvider {
 		}
 		else if (action_str != null && action_str.equals(ACTION_UPDATE)) {
 			Log.v("TimeAppWidget action", action_str);
-			_curWeek = intent.getStringExtra("nowWeek");
-			Log.v("TimeAppWidget", "_curWeek=" + _curWeek);
+			int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+			Log.v("hour", hour+"");
+			if (hour >= 22) _curIndex = 1;
+			else if (hour >= 18) _curIndex = 5;
+			else if (hour >= 16) _curIndex = 4;
+			else if (hour >= 12) _curIndex = 3;
+			else if (hour >= 9) _curIndex = 2;
+			
 		}
 		onUpdate(context, appWidgetManager, appWidgetIds);
 	}
-
+	
+	private String getWeek(Context context) {
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		Calendar c = Calendar.getInstance();
+		long now_day = c.getTimeInMillis() / 1000 / 60 / 60 / 24;
+		long start_day = preferences.getLong("start_day", 0);
+		int nowWeek = (int) ((now_day - start_day) / 7);			
+		nowWeek = nowWeek % 20;
+		String[] nowWeeks = context.getResources().getStringArray(R.array.now_weeks);
+		return nowWeeks[nowWeek];
+	}
 }

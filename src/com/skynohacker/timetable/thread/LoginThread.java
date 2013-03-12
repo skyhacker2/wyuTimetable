@@ -41,22 +41,27 @@ public class LoginThread extends Thread {
 		}
 		_handler.sendEmptyMessage(LoginHandler.LOGIN);
 		try {
+			List<ClassInfo> result = null;
+
 			if (!api.login(_context)) {
 				_handler.sendEmptyMessage(LoginHandler.ERROR);
 				return;
 			}
 			_handler.sendEmptyMessage(LoginHandler.DOWNLOAD);
-			List<ClassInfo> result = api.getTimetable();
-			if (result == null)
-				Log.w("timetable data", "null");
-			for (ClassInfo info : result) {
-				System.out.printf("%s %s %s %s %d %d\n", info.classname,
-						info.time, info.location, info.teacher, info.week,
-						info.classtime);
+			result = api.getTimetable();			
+			if (result != null) {
+				for (ClassInfo info : result) {
+					System.out.printf("%s %s %s %s %d %d\n", info.classname,
+							info.time, info.location, info.teacher, info.week,
+							info.classtime);
+				}
+				writeToDatabase(result);
+				_handler.sendEmptyMessage(LoginHandler.FINISH);
+			} else {
+				_handler.sendEmptyMessage(LoginHandler.EXCEPTION);
 			}
-			writeToDatabase(result);
-			_handler.sendEmptyMessage(LoginHandler.FINISH);
-		} catch(SocketTimeoutException e) {
+
+		} catch (SocketTimeoutException e) {
 			_handler.sendEmptyMessage(LoginHandler.TIMEOUT);
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
@@ -66,18 +71,21 @@ public class LoginThread extends Thread {
 			e.printStackTrace();
 		}
 	}
+
 	/**
 	 * 将课程表写进数据库了
-	 * @param list List<ClassInfo>包含课程表的链表
+	 * 
+	 * @param list
+	 *            List<ClassInfo>包含课程表的链表
 	 */
 	private void writeToDatabase(List<ClassInfo> list) {
 		SQLiteDatabase database = _context.openOrCreateDatabase(
-				DisplayActivity.DATABASE_NAME, DisplayActivity.MODE_PRIVATE, null);
+				DisplayActivity.DATABASE_NAME, DisplayActivity.MODE_PRIVATE,
+				null);
 		// 查询课程表是否存在
-		Cursor c = database
-				.rawQuery(
-						"SELECT name From sqlite_master WHERE type='table' AND name=?",
-						new String[] { DisplayActivity.TABLE_NAME });
+		Cursor c = database.rawQuery(
+				"SELECT name From sqlite_master WHERE type='table' AND name=?",
+				new String[] { DisplayActivity.TABLE_NAME });
 		if (c.getCount() > 0) {
 			database.execSQL("DROP TABLE " + DisplayActivity.TABLE_NAME);
 		}
@@ -85,7 +93,7 @@ public class LoginThread extends Thread {
 				.format("CREATE TABLE %s (classname TEXT, time TEXT, location TEXT, teacher TEXT, week INTEGER, classtime INTEGER)",
 						DisplayActivity.TABLE_NAME);
 		database.execSQL(create_table);
-		
+
 		for (ClassInfo info : list) {
 			ContentValues cv = new ContentValues();
 			cv.put("classname", info.classname);

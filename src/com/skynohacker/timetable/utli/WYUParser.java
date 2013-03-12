@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.util.Log;
+
 public class WYUParser {
 
 	/**
@@ -58,4 +60,6 @@ public class WYUParser {
 			}
 		return result;
 	}
+	
+
 }

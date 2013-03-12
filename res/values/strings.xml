@@ -1,9 +1,9 @@
 <resources>
 
-    <string name="app_name">益达课表</string>
+    <string name="app_name">邑大课表</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">设置</string>
-    <string name="title_activity_display">益达课表</string>
+    <string name="title_activity_display">邑大课表</string>
 
     <color name="item1_bg1">#33B5E5</color>
     <color name="item1_bg2">#0099CC</color>
@@ -39,7 +39,7 @@
 
     <string name="pre_accounts_settings">账号设置</string>
     <string name="about">about</string>
-    <string name="pre_about_content">这是一款开源的邑大课程表软件\n作者: @NovemberEleven1111</string>
+    <string name="pre_about_content">这是一款开源的邑大课程表软件\n\n作者: @NovemberEleven1111\n\n源码地址:https://github.com/skyhacker2/wyuTimetable</string>
     <string name="pre_other">其他</string>
     <string name="pre_now_week">pre_now_week</string>
 

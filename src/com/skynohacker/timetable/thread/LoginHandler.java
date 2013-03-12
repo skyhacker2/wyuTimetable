@@ -25,6 +25,7 @@ public class LoginHandler extends Handler{
 	public static final int TIMEOUT = 4;		// 超时
 	public static final int ERROR = 5;		// 账号或密码错误
 	public static final int NETWORK_UNAVAILABLE = 6;	// 网络不可用
+	public static final int EXCEPTION = 7;
 	
 	public LoginHandler(Context context, ProgressDialog dialog) {
 		_dialog = dialog;
@@ -67,6 +68,10 @@ public class LoginHandler extends Handler{
 			((DisplayActivity)_context).initPreferences();
 			((DisplayActivity)_context).initLayout();
 			Toast.makeText(_context, "课表已更新", Toast.LENGTH_SHORT).show();
+			break;
+		case EXCEPTION:
+			_dialog.dismiss();
+			Toast.makeText(_context, "获取课程出现异常", Toast.LENGTH_LONG).show();
 			break;
 		}
 		super.handleMessage(msg);

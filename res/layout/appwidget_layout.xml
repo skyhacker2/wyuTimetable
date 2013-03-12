@@ -2,7 +2,8 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    >
 
     <LinearLayout
         
@@ -11,7 +12,8 @@
         android:layout_height="match_parent"
         android:background="@drawable/abs__dialog_full_holo_dark"
         android:orientation="horizontal"
-        android:padding="@dimen/widget_margin" >
+        android:padding="8dp"
+         >
 
         <LinearLayout
             android:layout_width="0dp"

@@ -38,20 +38,12 @@ public class TimetableService extends Service{
 	public void onCreate() {
 		super.onCreate();
 		AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-		am.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000 * 60 * 60, getIntent());
-		am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), getIntent());
+		am.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000 * 60 * 10, getIntent());
+		//am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), getIntent());
 	}
 	
 	private PendingIntent getIntent() {
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-		Calendar c = Calendar.getInstance();
-		long now_day = c.getTimeInMillis() / 1000 / 60 / 60 / 24;
-		long start_day = preferences.getLong("start_day", 0);
-		int nowWeek = (int) ((now_day - start_day) / 7);			
-		nowWeek = nowWeek % 20;
-		String[] nowWeeks = getResources().getStringArray(R.array.now_weeks);
 		Intent intent = new Intent(this, TimeAppWidgetProvider.class);		
-		intent.putExtra("nowWeek", nowWeeks[nowWeek]);
 		intent.setAction("com.skynohacker.timetable.update_appwidget");
 		PendingIntent pi = PendingIntent.getBroadcast(this, 0, intent, 0);
 		return pi;

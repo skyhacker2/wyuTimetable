@@ -33,8 +33,9 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 
 	String[] nowWeeks;
 
-	private final static String DEFAULT_USERID = "学生子服务系统学号";
-	private final static String DEFAULT_USERPW = "学生子服务系统密码";
+	public final static String DEFAULT_USERID = "学生子服务系统学号";
+	public final static String DEFAULT_USERPW = "学生子服务系统密码";
+	public final static String DEFAULT_WEEK = "请选择";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -52,14 +53,20 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 		_aboutPre.setOnPreferenceClickListener(this);
 		_userId.setSummary(_preferences.getString("user_id", DEFAULT_USERID));
 		String user_pw = _preferences.getString("user_pw", DEFAULT_USERPW);
-		if (!user_pw.equals(DEFAULT_USERPW)) user_pw = "******";
+		if (!user_pw.equals(DEFAULT_USERPW))
+			user_pw = "******";
 		_userPw.setSummary(user_pw);
 
 		_nowWeeksPre = (ListPreference) findPreference(getString(R.string.pre_now_week));
-		int nowWeek = Integer.parseInt(_preferences.getString(
-				getString(R.string.pre_now_week), "0"));
-		System.out.println("nowWeek=" + nowWeek);
-		_nowWeeksPre.setTitle(nowWeeks[nowWeek]);
+		String pos = _preferences.getString(getString(R.string.pre_now_week),
+				DEFAULT_WEEK);
+		if (!pos.equals(DEFAULT_WEEK)) {
+			int nowWeek = Integer.parseInt(pos);
+			System.out.println("nowWeek=" + nowWeek);
+			_nowWeeksPre.setTitle(nowWeeks[nowWeek]);
+		} else {
+			_nowWeeksPre.setTitle(DEFAULT_WEEK);
+		}
 
 	}
 
@@ -98,7 +105,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 			// 现在离1970年是多少天
 			long now_day = calendar.getTimeInMillis() / 1000 / 60 / 60 / 24;
 			// 今天是星期几 SUNDAY=1
-			int day_of_week = calendar.get(Calendar.DAY_OF_WEEK)-1;
+			int day_of_week = calendar.get(Calendar.DAY_OF_WEEK) - 1;
 			// 第一周开始时间
 			long start_day = now_day - nowWeek * 7 - day_of_week;
 			SharedPreferences.Editor editor = _preferences.edit();
@@ -143,6 +150,11 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 			onBackPressed();
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onBackPressed() {
+		super.onBackPressed();
 	}
 
 }
