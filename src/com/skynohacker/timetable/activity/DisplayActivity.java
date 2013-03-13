@@ -33,6 +33,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
@@ -78,6 +79,7 @@ public class DisplayActivity extends SherlockActivity implements
 	public static final String TABLE_NAME = "timetable";
 
 	public static final int SETTINGS_CODE = 1;
+	private Handler _initHandler;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -105,18 +107,46 @@ public class DisplayActivity extends SherlockActivity implements
 		getSupportActionBar().setTitle("课表");
 		getSupportActionBar().setHomeButtonEnabled(true);
 		getSupportActionBar().setSelectedNavigationItem(_curWeek);
-
+		
 		_inflater = getLayoutInflater();
 		_viewPager = (ViewPager) findViewById(R.id.viewPager);
-
-		_viewPagers = new ArrayList<View>();
-		for (int i = 0; i < 7; i++)
-			_viewPagers.add(getView(i));
-		_viewPagers.add(getAllClassView());
-		_viewPager.setDrawingCacheEnabled(true);
+		/*
 		_viewPager.setAdapter(new MyPagerAdapter());
+		_viewPager.setDrawingCacheEnabled(true);		
 		_viewPager.setOnPageChangeListener(new MyPagerChangeListener());
 		_viewPager.setCurrentItem(_curWeek);
+		*/
+		
+		final LoadingDialog dialog = new LoadingDialog(this);
+		dialog.show();
+		_initHandler = new Handler() {
+
+			@Override
+			public void handleMessage(Message msg) {				
+				_viewPager.setAdapter(new MyPagerAdapter());
+				_viewPager.setDrawingCacheEnabled(true);		
+				_viewPager.setOnPageChangeListener(new MyPagerChangeListener());
+				_viewPager.setCurrentItem(_curWeek);
+				dialog.dismiss();
+				super.handleMessage(msg);
+			}
+			
+		};
+		_viewPagers = new ArrayList<View>();
+		
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				for (int i = 0; i < 7; i++)
+					_viewPagers.add(getView(i));
+				_viewPagers.add(getAllClassView());
+				_initHandler.sendEmptyMessage(0);
+			}
+		}).start();
+		
+		
 
 	}
 
@@ -126,9 +156,10 @@ public class DisplayActivity extends SherlockActivity implements
 		if (requestCode == SETTINGS_CODE && resultCode == RESULT_OK) {
 			refresh();
 		} else {
-			if (_preferences.getBoolean("hasData", false) == true)	
+			if (_preferences.getBoolean("hasData", false) == true)	 {
 				initPreferences();
 				initLayout();
+			}
 		}
 		super.onActivityResult(requestCode, resultCode, data);
 	}
@@ -165,27 +196,33 @@ public class DisplayActivity extends SherlockActivity implements
 
 		@Override
 		public int getCount() {
-			// TODO Auto-generated method stub
-			return _viewPagers.size();
+			return _viewPagers.size();			
 		}
 
 		@Override
 		public boolean isViewFromObject(View arg0, Object arg1) {
-			// TODO Auto-generated method stub
 			return arg0 == arg1;
 		}
 
 		@Override
 		public Object instantiateItem(ViewGroup arg0, int position) {
-			// TODO Auto-generated method stub
 			((ViewPager) arg0).addView(_viewPagers.get(position));
+			/*
+			View view = null;
+			if (position < 7)
+				nview = getView(position);
+			else 
+				view = getAllClassView();
+			((ViewPager) arg0).addView(view);
+			*/
 			return _viewPagers.get(position);
+			//return view;
 		}
 
 		@Override
 		public void destroyItem(ViewGroup container, int position, Object object) {
-			// TODO Auto-generated method stub
-			((ViewPager) container).removeView(_viewPagers.get(position));
+			//((ViewPager) container).removeView(_viewPagers.get(position));
+			((ViewPager) container).removeView((View)object);
 		}
 
 	}
@@ -306,6 +343,8 @@ public class DisplayActivity extends SherlockActivity implements
 								| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		Intent shareIntent = new Intent(Intent.ACTION_SEND);
 		shareIntent.setType("image/*");
+		String url = "http://zhushou.360.cn/detail/index/soft_id/235066?recrefer=SE_D_%E9%82%91%E5%A4%A7%E8%AF%BE%E8%A1%A8";
+		shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text) + url);
 		ShareActionProvider actionProvider = new ShareActionProvider(this);
 		actionProvider.setShareIntent(shareIntent);
 		Uri uri = Uri.fromFile(getFileStreamPath("share.png"));
@@ -382,7 +421,6 @@ public class DisplayActivity extends SherlockActivity implements
 		LoginHandler handler = new LoginHandler(this, dialog);
 		LoginThread thread = new LoginThread(this, handler, userid, userpw);
 		thread.start();
-		SherlockDialogFragment sherlockDialog = new SherlockDialogFragment();
 	}
 
 	/***

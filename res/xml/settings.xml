@@ -32,6 +32,7 @@
             android:key="@string/about"
             android:summary="作者信息"
             android:title="关于" />
+        <Preference android:key="@string/feedback" android:title="意见反馈" android:summary="如果你对本软件有建议，欢迎告诉我。"/>
     </PreferenceCategory>
 
 </PreferenceScreen>

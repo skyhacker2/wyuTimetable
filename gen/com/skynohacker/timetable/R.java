@@ -949,13 +949,16 @@ containing a value of this type.
         public static final int ic_launcher=0x7f020076;
         public static final int ic_navigation_collapse=0x7f020077;
         public static final int ic_navigation_expand=0x7f020078;
-        public static final int ic_refresh=0x7f020079;
-        public static final int ic_refresh_inverse=0x7f02007a;
-        public static final int ic_search_inverse=0x7f02007b;
-        public static final int list_content_shap=0x7f02007c;
-        public static final int location=0x7f02007d;
-        public static final int teacher=0x7f02007e;
-        public static final int week_header_shap=0x7f02007f;
+        public static final int ic_navigation_refresh=0x7f020079;
+        public static final int ic_refresh=0x7f02007a;
+        public static final int ic_refresh_inverse=0x7f02007b;
+        public static final int ic_search_inverse=0x7f02007c;
+        public static final int ic_settings=0x7f02007d;
+        public static final int ic_social_share=0x7f02007e;
+        public static final int list_content_shap=0x7f02007f;
+        public static final int location=0x7f020080;
+        public static final int teacher=0x7f020081;
+        public static final int week_header_shap=0x7f020082;
     }
     public static final class id {
         public static final int abs__action_bar=0x7f050022;
@@ -1125,9 +1128,10 @@ containing a value of this type.
         public static final int item5=0x7f030022;
         public static final int items=0x7f030023;
         public static final int main=0x7f030024;
-        public static final int sherlock_spinner_dropdown_item=0x7f030025;
-        public static final int sherlock_spinner_item=0x7f030026;
-        public static final int week_header=0x7f030027;
+        public static final int progress_dialog=0x7f030025;
+        public static final int sherlock_spinner_dropdown_item=0x7f030026;
+        public static final int sherlock_spinner_item=0x7f030027;
+        public static final int week_header=0x7f030028;
     }
     public static final class menu {
         public static final int activity_display=0x7f0d0000;
@@ -1182,6 +1186,7 @@ containing a value of this type.
         public static final int abs__shareactionprovider_share_with_application=0x7f0a0009;
         public static final int action_bar_share_with=0x7f0a001c;
         public static final int app_name=0x7f0a000f;
+        public static final int feedback=0x7f0a001d;
         public static final int hasData=0x7f0a0015;
         public static final int hello_world=0x7f0a0010;
         public static final int menu_refresh=0x7f0a0016;
@@ -1190,6 +1195,7 @@ containing a value of this type.
         public static final int pre_accounts_settings=0x7f0a0017;
         public static final int pre_now_week=0x7f0a001b;
         public static final int pre_other=0x7f0a001a;
+        public static final int share_text=0x7f0a001e;
         public static final int title_activity_display=0x7f0a0012;
         public static final int userId=0x7f0a0013;
         public static final int userPw=0x7f0a0014;

@@ -9,12 +9,16 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceManager;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.Menu;
@@ -29,6 +33,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 	private EditTextPreference _userPw;
 	private Preference _aboutPre;
 	private ListPreference _nowWeeksPre;
+	private Preference _feedbackPre;
 	private static final int DONE_MENU_ID = 0;
 
 	String[] nowWeeks;
@@ -51,6 +56,9 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 		_userPw = (EditTextPreference) findPreference(getString(R.string.userPw));
 		_aboutPre = (Preference) findPreference(getString(R.string.about));
 		_aboutPre.setOnPreferenceClickListener(this);
+		_feedbackPre = (Preference) findPreference(getString(R.string.feedback));
+		_feedbackPre.setOnPreferenceClickListener(this);
+		
 		_userId.setSummary(_preferences.getString("user_id", DEFAULT_USERID));
 		String user_pw = _preferences.getString("user_pw", DEFAULT_USERPW);
 		if (!user_pw.equals(DEFAULT_USERPW))
@@ -130,6 +138,19 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 				}
 			});
 			builder.create().show();
+		} else if (preference.getKey().equals(getString(R.string.feedback))) {
+			PackageInfo packageInfo = null;
+			try {
+				packageInfo = getPackageManager().getPackageInfo(this.getPackageName(), 0);
+			} catch (NameNotFoundException e) {
+				e.printStackTrace();
+			}
+			
+			Intent intent = new Intent(Intent.ACTION_SEND);
+			intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"skyhacker@126.com"});
+			intent.putExtra(Intent.EXTRA_SUBJECT, "邑大课表" + packageInfo.versionName + "用户反馈");
+			intent.setType("message/rfc822");
+			startActivity(intent);
 		}
 
 		return true;

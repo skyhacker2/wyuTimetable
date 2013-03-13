@@ -2,13 +2,13 @@
 
     <item
         android:id="@+id/menu_settings"
-        android:icon="@drawable/ic_compose_inverse"
+        android:icon="@drawable/ic_settings"
         android:orderInCategory="100"
         android:showAsAction="ifRoom"
         android:title="@string/menu_settings"/>
     <item
         android:id="@+id/menu_refresh"
-        android:icon="@drawable/ic_refresh_inverse"
+        android:icon="@drawable/ic_navigation_refresh"
         android:orderInCategory="100"
         android:showAsAction="ifRoom"
         android:title="@string/menu_refresh">
